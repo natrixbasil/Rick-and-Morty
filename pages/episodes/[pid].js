@@ -1,5 +1,4 @@
 import Head from "next/head";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -12,18 +11,18 @@ export default function EpisodeProfile() {
     router.query.pid &&
       fetch(`https://rickandmortyapi.com/api/episode/${router.query.pid}`)
         .then((res) => res.json())
-      // Логика, если персонажи будут приходить массивом IRI
+        // Логика, если эпизоды будут приходить массивом IRI
         .then(async (res) => {
-          if (res.character?.length) {
+          if (res.characters?.length) {
             await fetch(
-              `https://rickandmortyapi.com/api/character/${res.character
-                .map((character) => character.split("/").pop())
+              `https://rickandmortyapi.com/api/character/${res.characters
+                .map((characters) => characters.split("/").pop())
                 .join(",")}`
             )
               .then((res) => res.json())
               .then((characters) => {
                 console.log(characters)
-                res.character = Array.isArray(characters) ? characters : [characters]
+                res.characters = Array.isArray(characters) ? characters : [characters]
               });
           }
 
@@ -32,7 +31,7 @@ export default function EpisodeProfile() {
         .then((res) => setData(res));
   }, [router.query]);
 
-  console.log(data);
+  console.log(data.characters);
 
   return (
     <>
@@ -43,21 +42,17 @@ export default function EpisodeProfile() {
       </Head>
 
       <main style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+        <button onClick={router.back}>GO BACK</button>
         <h1>{data.name}</h1>
         <div style={{ display: "grid", gridColumn: 2, gap: "10px" }}>
           <div
             style={{ display: "flex", flexDirection: "column", gap: "10px" }}
           >
-            <h3>Information</h3>
-          </div>
-          <div
-            style={{ display: "flex", flexDirection: "column", gap: "10px" }}
-          >
             <h3>Characters</h3>
-            {data.character?.map((episode) => (
-              <Link key={episode.id} href={`/characters/${character.id}`}>
+            {data?.characters?.map((characters) => (
+              <Link key={characters.id} href={`/characters/${characters.id}`}>
                 <div>
-                  <p>{character.name}</p>
+                    <p>{characters.name}</p>
                 </div>
               </Link>
             ))}
